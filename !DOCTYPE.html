@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>Gift</title>
+
+<style>
+body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    font-family: monospace;
+}
+canvas {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.onresize = resize;
+
+const chars = "0123456789";
+const fontSize = 20;
+let columns = Math.floor(canvas.width / fontSize);
+let drops = Array(columns).fill(1);
+
+let reveal = false;
+let revealProgress = 0;
+
+// ✨ غيّر الكلمة هنا
+const secretText = "HAPPY BIRTHDAY";
+
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0,0,0,0.15)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = fontSize + "px monospace";
+    ctx.fillStyle = "#ff3333";
+    ctx.shadowColor = "#ff5555";
+    ctx.shadowBlur = 12;
+
+    if (!reveal) {
+        for (let i = 0; i < drops.length; i++) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.97) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+
+    // الكلمة المخفية (دائمًا موجودة)
+    ctx.save();
+    ctx.globalAlpha = reveal ? revealProgress : 0.15;
+    ctx.font = `${60 + revealProgress * 60}px monospace`;
+    ctx.fillStyle = "white";
+    ctx.shadowColor = "#ff69b4";
+    ctx.shadowBlur = 30;
+
+    const textWidth = ctx.measureText(secretText).width;
+    ctx.fillText(
+        secretText,
+        canvas.width / 2 - textWidth / 2,
+        canvas.height / 2
+    );
+    ctx.restore();
+
+    if (reveal && revealProgress < 1) {
+        revealProgress += 0.02;
+    }
+}
+
+const interval = setInterval(drawMatrix, 50);
+
+// ⏱️ بعد 6 ثواني تبدأ عملية الانكشاف
+setTimeout(() => {
+    reveal = true;
+}, 6000);
+</script>
+
+</body>
+</html>
